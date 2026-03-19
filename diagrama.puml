@@ -1,0 +1,76 @@
+classDiagram
+    class Cliente {
+        <<abstract>>
+        # _id: int
+        # _nombre: str
+        # _email: str
+        # _telefono: str
+        # _direccion: str
+        + __str__()
+        + __eq__(otro)
+        + calcular_descuento(): float
+    }
+
+    class ClienteRegular {
+        + calcular_descuento(): float
+    }
+
+    class ClientePremium {
+        - nivel_membresia: str
+        + calcular_descuento(): float
+    }
+
+    class ClienteCorporativo {
+        - nombre_empresa: str
+        + calcular_descuento(): float
+    }
+
+    class GestorBD {
+        <<DBManager>>
+        - db_path: str
+        - conn: Connection
+        + __enter__()
+        + __exit__()
+        + configurar_base_de_datos()
+        + agregar_cliente(cliente)
+        + obtener_cliente(id)
+        + obtener_todos_los_clientes()
+        + actualizar_cliente(cliente)
+        + eliminar_cliente(id)
+    }
+
+    class GestorArchivos {
+        <<FileManager>>
+        + exportar_a_json(gestor_bd, ruta)
+        + exportar_a_csv(gestor_bd, ruta)
+    }
+
+    class ServicioCliente {
+        <<ClientService>>
+        - gestor_bd: GestorBD
+        + crear_cliente(cliente): bool
+    }
+
+    class IntegracionAPI {
+        <<api_integration>>
+        + validar_identidad(id): bool
+        + enviar_email_bienvenida(email, nombre): bool
+    }
+
+    class app_flask {
+        <<main.py>>
+        + /
+        + /add
+    }
+
+    Cliente <|-- ClienteRegular
+    Cliente <|-- ClientePremium
+    Cliente <|-- ClienteCorporativo
+
+    ServicioCliente --o GestorBD : "usa un"
+    app_flask --> ServicioCliente : "coordina con"
+    app_flask --> GestorBD : "usa para"
+
+    ServicioCliente --> IntegracionAPI : "depende de"
+    GestorArchivos --> GestorBD : "depende de"
+    GestorBD --> Cliente : "crea"

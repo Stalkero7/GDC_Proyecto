@@ -27,7 +27,8 @@ class DBManager:
             return self
         except sqlite3.Error as e:
             logging.error(f"Error al conectar a la base de datos: {e}")
-            raise
+            self.conn = None  # Asegurarse de que la conexión es nula en caso de error
+            return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Cierra la conexión con la base de datos."""
@@ -36,6 +37,9 @@ class DBManager:
 
     def setup_database(self):
         """Crea la tabla de clientes si no existe."""
+        if not self.conn:
+            logging.error("No hay conexión a la base de datos para configurar la tabla.")
+            return
         try:
             cursor = self.conn.cursor()
             cursor.execute("""
@@ -57,6 +61,9 @@ class DBManager:
 
     def add_client(self, client):
         """Añade un nuevo cliente a la base de datos."""
+        if not self.conn:
+            logging.error("No hay conexión a la base de datos para añadir el cliente.")
+            return
         try:
             cursor = self.conn.cursor()
             data = {
@@ -87,6 +94,9 @@ class DBManager:
 
     def get_client(self, client_id):
         """Obtiene un cliente por su ID."""
+        if not self.conn:
+            logging.error("No hay conexión a la base de datos para obtener el cliente.")
+            return None
         try:
             cursor = self.conn.cursor()
             cursor.execute("SELECT * FROM clientes WHERE id = ?", (client_id,))
@@ -106,6 +116,9 @@ class DBManager:
 
     def get_all_clients(self):
         """Obtiene todos los clientes de la base de datos."""
+        if not self.conn:
+            logging.error("No hay conexión a la base de datos para obtener todos los clientes.")
+            return []
         try:
             cursor = self.conn.cursor()
             cursor.execute("SELECT * FROM clientes")
@@ -127,6 +140,9 @@ class DBManager:
 
     def update_client(self, client):
         """Actualiza un cliente existente en la base de datos."""
+        if not self.conn:
+            logging.error("No hay conexión a la base de datos para actualizar el cliente.")
+            return
         try:
             cursor = self.conn.cursor()
             data = {
@@ -157,6 +173,9 @@ class DBManager:
 
     def delete_client(self, client_id):
         """Elimina un cliente de la base de datos por su ID."""
+        if not self.conn:
+            logging.error("No hay conexión a la base de datos para eliminar el cliente.")
+            return
         try:
             cursor = self.conn.cursor()
             cursor.execute("DELETE FROM clientes WHERE id = ?", (client_id,))

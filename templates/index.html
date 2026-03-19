@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Clientes Inteligente</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Gestor de Clientes</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <a href="{{ url_for('add_client') }}" class="btn btn-primary mb-3">Añadir Nuevo Cliente</a>
+
+        <h2>Clientes Actuales</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Dirección</th>
+                    <th>Tipo</th>
+                    <th>Detalles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                <tr>
+                    <td>{{ client.id }}</td>
+                    <td>{{ client.nombre }}</td>
+                    <td>{{ client.email }}</td>
+                    <td>{{ client.telefono }}</td>
+                    <td>{{ client.direccion }}</td>
+                    <td>{{ client.__class__.__name__ }}</td>
+                    <td>
+                        {% if client.__class__.__name__ == 'PremiumClient' %}
+                            Nivel: {{ client.nivel_membresia }}
+                        {% elif client.__class__.__name__ == 'CorporateClient' %}
+                            Empresa: {{ client.nombre_empresa }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2 class="mt-5">Actividad Reciente</h2>
+        <textarea class="form-control" rows="10" readonly>{{ logs }}</textarea>
+    </div>
+</body>
+</html>
